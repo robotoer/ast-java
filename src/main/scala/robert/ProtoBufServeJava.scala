@@ -21,23 +21,29 @@ package robert
 
 import java.io.ByteArrayInputStream
 import java.io.InputStream
-import japa.parser.JavaParser
-import japa.parser.ast.CompilationUnit
 
+import io.backchat.hookup.Connected
 import io.backchat.hookup.InboundMessage
 import io.backchat.hookup.HookupServer
 import io.backchat.hookup.TextMessage
 import io.backchat.hookup.HookupServer.HookupServerClient
 
-import org.json4s.jackson.JsonMethods._
+import japa.parser.JavaParser
+import japa.parser.ast.CompilationUnit
 
-object ServeJava {
+import org.slf4j.LoggerFactory
+
+object ProtoBufServeJava {
+  val logger = LoggerFactory.getLogger(this.getClass)
+
   def main(args: Array[String]) {
-    HookupServer(8125) {
+    // Setup the server client.
+    val server = HookupServer(8125) {
       new HookupServerClient {
-        def receive: PartialFunction[InboundMessage, Unit] = {
+        override def receive: PartialFunction[InboundMessage, Unit] = {
+          case Connected => logger.info("Connection opened!")
           case TextMessage(text) => {
-            // Parse and return as JSON.
+            // Parse the text.
             val in: InputStream = new ByteArrayInputStream(text.getBytes("UTF-8"))
             val compilationUnit: CompilationUnit =
                 try {
@@ -46,11 +52,22 @@ object ServeJava {
                   in.close()
                 }
             val ast: AstNode = (new JavaAstVisitor).visit(compilationUnit, null)
-            val json = (new JsonAstSerDe).serialize(ast)
-            send(compact(render(json)))
+
+            // Serialize and base64 encode the resulting byte array.
+            val serialized = ProtoBufAstSerDe.serialize(ast)
+            logger.debug(s"Encoding ${serialized.toString}")
+            val messageBytes: Array[Byte] = serialized.toByteArray
+            val base64string: String = new sun.misc.BASE64Encoder().encode(messageBytes)
+            logger.debug(s"Sending ${base64string}")
+
+            // Send the response.
+            send(base64string)
           }
         }
       }
-    }.start
+    }
+
+    // Start the server.
+    server.start
   }
 }

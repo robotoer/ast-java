@@ -19,6 +19,16 @@
 
 package robert
 
+/// Things to do:
+// - Create a protocol buffer based rpc system for communicating with Dart.
+//   - Is there a dart proto-buf library?
+//   - Add a way to store changes made/diff system.
+// - Create a library for translating one type of AST into another with type-class like
+//   conversion trait(?).
+//   - Ordering can be achieved with a DAG type dependency description. Each conversion trait(?)
+//     node(?) can have things it should be scheduled to be before(?).
+// - Use AST libraries to autogenerate code handling of dart and java/scala interfacing code.
+
 // AST ---------------------------------------------------------------------------------------------
 
 sealed trait AstNode {

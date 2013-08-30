@@ -29,7 +29,7 @@ import org.json4s.JsonAST.JString
 import org.json4s.JsonAST.JValue
 
 
-class JsonAstSerDe extends AstSerDe[JValue] {
+object JsonAstSerDe extends AstSerDe[JValue] {
   def serialize(node: AstNode): JValue = {
     node match {
       case NullNode => JNull

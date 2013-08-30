@@ -1,0 +1,51 @@
+package ast;
+
+option java_package = "robert.protobuf";
+option java_outer_classname = "AstProtos";
+
+message AstNode {
+  // Currently supported:
+  // - "null"
+  // - "boolean"
+  // - "decimal"
+  // - "integer"
+  // - "string"
+  // - "list"
+  // - "map"
+  required string node_type = 1;
+
+  // Leaf nodes.
+  optional bool boolean_node = 2;
+  optional double decimal_node = 3;
+  optional sint64 integer_node = 4;
+  optional string string_node = 5;
+
+  // Tree nodes.
+  optional ListNode list_node = 6;
+  optional MapNode map_node = 7;
+}
+
+// Compounds (subtrees).
+message ListNode {
+  optional string node_type = 1;
+  repeated AstNode children = 2;
+}
+message MapNode {
+  message Entry {
+    required string field = 1;
+    required AstNode value = 2;
+  }
+
+  optional string node_type = 1;
+  repeated Entry children = 2;
+}
+
+// Temporary serialization message types
+// For now request/write everything.
+
+// AST Operations/Diffs
+// ???
+
+// RPC Operations:
+// get - Read data from the ast server.
+// put - Write diffs to the ast server.

@@ -13,14 +13,20 @@
   <inceptionYear>2013</inceptionYear>
 
   <properties>
+    <!-- Scala version -->
     <scala.version>2.10.2</scala.version>
     <scala-library.version>2.10</scala-library.version>
 
+    <!-- Dependency versions -->
+    <slf4j.version>1.7.5</slf4j.version>
     <javaparser.version>1.0.8</javaparser.version>
     <json4s.version>3.2.4</json4s.version>
+    <protobuf-java.version>2.4.1</protobuf-java.version>
     <hookup.version>0.2.3</hookup.version>
 
+    <!-- Plugin versions -->
     <scala-maven-plugin.version>3.1.5</scala-maven-plugin.version>
+    <maven-protoc-plugin.version>0.3.1</maven-protoc-plugin.version>
   </properties>
 
   <dependencies>
@@ -30,7 +36,20 @@
       <version>${scala.version}</version>
       <scope>compile</scope>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>compile</scope>
+    </dependency>
 
+    <!-- Parsing dependencies -->
     <dependency>
       <groupId>com.google.code.javaparser</groupId>
       <artifactId>javaparser</artifactId>
@@ -38,19 +57,27 @@
       <scope>compile</scope>
     </dependency>
 
+    <!-- API dependencies -->
     <dependency>
       <groupId>org.json4s</groupId>
       <artifactId>json4s-jackson_${scala-library.version}</artifactId>
       <version>${json4s.version}</version>
       <scope>compile</scope>
     </dependency>
-
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>${protobuf-java.version}</version>
+      <scope>compile</scope>
+    </dependency>
     <dependency>
       <groupId>io.backchat.hookup</groupId>
       <artifactId>hookup_${scala-library.version}</artifactId>
       <version>${hookup.version}</version>
       <scope>compile</scope>
     </dependency>
+
+    <!-- Test dependencies -->
   </dependencies>
 
   <build>
@@ -70,13 +97,41 @@
               <args>
                 <arg>-unchecked</arg>
                 <arg>-deprecation</arg>
-                <arg>-explaintypes</arg>
               </args>
-              <sendJavaToScalac>false</sendJavaToScalac>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.google.protobuf.tools</groupId>
+        <artifactId>maven-protoc-plugin</artifactId>
+        <version>${maven-protoc-plugin.version}</version>
+        <configuration>
+          <protocExecutable>/usr/bin/protoc</protocExecutable>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <protoSourceRoot>${basedir}/src/main/protobuf</protoSourceRoot>
+              <includes>
+                <param>**/*.proto</param>
+              </includes>
             </configuration>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>protoc-plugin</id>
+      <url>http://sergei-ivanov.github.com/maven-protoc-plugin/repo/releases/</url>
+    </pluginRepository>
+  </pluginRepositories>
 </project>
