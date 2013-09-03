@@ -13,6 +13,8 @@
   <inceptionYear>2013</inceptionYear>
 
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
     <!-- Scala version -->
     <scala.version>2.10.2</scala.version>
     <scala-library.version>2.10</scala-library.version>
@@ -83,6 +85,16 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <!-- set compliance level here -->
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
         <version>${scala-maven-plugin.version}</version>
@@ -97,9 +109,6 @@
               <args>
                 <arg>-unchecked</arg>
                 <arg>-deprecation</arg>
-                <!-- set compliance level here -->
-                <source>1.6</source>
-                <target>1.6</target>
               </args>
             </configuration>
           </execution>
@@ -116,7 +125,7 @@
           <execution>
             <goals>
               <goal>compile</goal>
-              <goal>testCompile</goal>
+              <!-- <goal>testCompile</goal> -->
             </goals>
             <phase>generate-sources</phase>
             <configuration>

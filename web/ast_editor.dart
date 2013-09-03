@@ -60,5 +60,5 @@ void main() {
   });
   final AstEditor editor = new AstEditor.fresh(editorElement, keybindings);
 
-  final AstClient client = new AstClient.fromAddress("ws://localhost:9001");
+  final AstClient client = new AstClient.fromAddress("ws://localhost:8125");
 }

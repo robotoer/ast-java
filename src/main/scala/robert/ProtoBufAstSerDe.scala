@@ -58,10 +58,10 @@ object ProtoBufAstSerDe extends AstSerDe[AstProtos.AstNode] {
       case MapNode(nodeType, children) => {
         val childMap = children
             .map { entry: (String, AstNode) =>
-              val (field, value) = entry
+              val (key, value) = entry
 
               AstProtos.MapNode.Entry.newBuilder()
-                  .setField(field)
+                  .setKey(key)
                   .setValue(serialize(value))
                   .build()
             }
@@ -96,7 +96,7 @@ object ProtoBufAstSerDe extends AstSerDe[AstProtos.AstNode] {
         val children = mapNode
             .getChildrenList
             .asScala
-            .map { entry => (entry.getField, deserialize(entry.getValue)) }
+            .map { entry => (entry.getKey, deserialize(entry.getValue)) }
             .toMap
 
         MapNode(

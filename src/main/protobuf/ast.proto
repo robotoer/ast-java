@@ -46,6 +46,55 @@ message MapNode {
 // AST Operations/Diffs
 // ???
 
-// RPC Operations:
+// RPC Operations
+
 // get - Read data from the ast server.
+message AstGetRequest {
+  // Path to the file to open.
+  optional string path = 1;
+
+  // Version number to fetch.
+  optional uint64 version = 2;
+
+  // TODO: Add support for other options like:
+  //       - xpath style queries
+  //       - UUID monotonically increasing version numbers for synchronizing.
+  //       - send diffs (can this be done statelessly?)
+}
+message AstGetResponse {
+  // Ast root node.
+  optional AstNode root = 1;
+
+  // Error message (if there is an error).
+  optional string error_message = 2;
+}
+
 // put - Write diffs to the ast server.
+message AstPutRequest {
+  // Path to write to.
+  optional string path = 1;
+
+  // AST to write.
+  optional AstNode root = 2;
+
+  // TODO: Add support for putting diffs.
+}
+message AstPutResponse {
+  optional string error_message = 1;
+}
+
+// Base response/request.
+message AstRequest {
+  required string request_type = 1;
+
+  optional AstGetRequest get_request = 2;
+
+  optional AstPutRequest put_request = 3;
+}
+message AstResponse {
+  required string response_type = 1;
+
+  optional AstGetResponse get_response = 2;
+
+  optional AstPutResponse put_response = 3;
+}

@@ -39,7 +39,7 @@ object LoadJava {
         }
 
     val ast: AstNode = (new JavaAstVisitor).visit(compilationUnit, null)
-    val json = (new JsonAstSerDe).serialize(ast)
+    val json = JsonAstSerDe.serialize(ast)
     println(pretty(render(json)))
   }
 }
