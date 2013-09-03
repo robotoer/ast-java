@@ -32,7 +32,7 @@ message ListNode {
 }
 message MapNode {
   message Entry {
-    required string field = 1;
+    required string key = 1;
     required AstNode value = 2;
   }
 

@@ -1,0 +1,9 @@
+name: ast_java_dart
+description: A sample WebUI application
+dependencies:
+  browser: any
+  protobuf:
+    path: /home/robert/src/dart-protobuf
+  dart_web_toolkit: any
+  js: any
+  web_ui: any

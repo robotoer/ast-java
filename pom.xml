@@ -97,6 +97,9 @@
               <args>
                 <arg>-unchecked</arg>
                 <arg>-deprecation</arg>
+                <!-- set compliance level here -->
+                <source>1.6</source>
+                <target>1.6</target>
               </args>
             </configuration>
           </execution>
