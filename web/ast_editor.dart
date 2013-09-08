@@ -2,12 +2,20 @@ library ast_editor;
 
 import 'dart:html';
 
+import 'package:crypto/crypto.dart';
+import 'package:protobuf/protobuf.dart';
 import 'package:logging/logging.dart';
 import 'package:web_ui/web_ui.dart';
-//import 'package:dart_web_toolkit/ui.dart' as ui;
+import 'package:dart_web_toolkit/ui.dart' as ui;
 
+import "ast.pb.dart" as ast_pb;
+
+part "ast.dart";
 part "ast_client.dart";
+part "ast_java.dart";
+part "ast_json.dart";
 part "ast_layout.dart";
+part "ast_render.dart";
 part "ast_shortcuts.dart";
 
 @observable
@@ -50,6 +58,8 @@ class AstEditor {
 void main() {
   final Logger logger = new Logger("jsoneditor_main");
   logger.info("Starting 'AST Editor'");
+
+  ui.SplitLayoutPanel panel = new ui.SplitLayoutPanel();
 
   final Element editorElement = queryAll("body").first;
   final AstShortcutTrie keybindings = new AstShortcutTrie.binding({

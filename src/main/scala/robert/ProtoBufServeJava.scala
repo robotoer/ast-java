@@ -19,6 +19,8 @@
 
 package robert
 
+import scala.collection.mutable
+
 import java.io.FileInputStream
 import java.io.PrintWriter
 
@@ -121,18 +123,70 @@ class AstServerClient extends HookupServerClient {
   }
 }
 
+//final case class Memoize[-KeyType, +CachedType](
+//    function: (KeyType => CachedType),
+//    cache: mutable.Map[KeyType, CachedType] = mutable.Map())
+//    extends (KeyType => CachedType) {
+//  override def apply(key: KeyType): CachedType = {
+//    if (cache.contains(key)) {
+//      cache(key)
+//    } else {
+//      val value = function(key)
+//      cache += (key -> value)
+//      value
+//    }
+//  }
+//}
+
 object AstServerClient {
   val logger: Logger = LoggerFactory.getLogger(classOf[AstServerClient])
 
+  /**
+   * Encodes a protocol buffer into a base64 string.
+   *
+   * @param response message to encode.
+   * @return the base64 string encoded message.
+   */
   def base64EncodeResponse(response: AstProtos.AstResponse): String = {
     new sun.misc.BASE64Encoder().encode(response.toByteArray)
   }
 
+//  val base64EncodeResponseCache: AstProtos.AstResponse => String = Memoize(base64EncodeResponse)
+//
+//  /**
+//   * Encodes a protocol buffer into a base64 string or uses a cached encoding. Caches all encode
+//   * operations for later use.
+//   *
+//   * @param response message to encode.
+//   * @return the base64 string encoded message.
+//   */
+//  def base64EncodeResponseCached(response: AstProtos.AstResponse): String =
+//      base64EncodeResponseCache(response)
+
+  /**
+   * Decodes a protocol buffer encoded into a base64 string containing a request message from a
+   * websocket client.
+   *
+   * @param request string to decode.
+   * @return the request message from a websocket client.
+   */
   def base64DecodeRequest(request: String): AstProtos.AstRequest = {
     val requestBytes: Array[Byte] = new sun.misc.BASE64Decoder().decodeBuffer(request)
 
     AstProtos.AstRequest.parseFrom(requestBytes)
   }
+
+//  val base64DecodeRequestCache: String => AstProtos.AstRequest = Memoize(base64DecodeRequest)
+//
+//  /**
+//   * Decodes a protocol buffer encoded into a base64 string containing a request message from a
+//   * websocket client or uses a cached decoding. Caches all decode operations for later use.
+//   *
+//   * @param request string to decode.
+//   * @return the request message from a websocket client.
+//   */
+//  def base64DecodeRequestCached(request: String): AstProtos.AstRequest =
+//      base64DecodeRequestCache(request)
 
   /**
    * Parses java code from a file.
@@ -144,10 +198,22 @@ object AstServerClient {
     ResourceUtils.doAndClose(new FileInputStream(path)) { JavaParser.parse }
   }
 
+  /**
+   * Writes an AST to a file.
+   *
+   * @param path to write to.
+   * @param ast to write to a file.
+   */
   def writeJavaFile(path: String, ast: CompilationUnit) {
     ResourceUtils.doAndClose(new PrintWriter(path)) { _.println(ast.toString) }
   }
 
+  /**
+   * Handles 'get' requests from websocket clients. Returns the requested AST section.
+   *
+   * @param request to handle.
+   * @return the response to respond with.
+   */
   def get(request: AstProtos.AstGetRequest): AstProtos.AstGetResponse = {
     // Read an AST from the provided coordinates.
     val ast: CompilationUnit = {
@@ -167,6 +233,13 @@ object AstServerClient {
         .build()
   }
 
+  /**
+   * Handles 'put' requests from websocket clients. Writes the specified AST to the specified
+   * location. Returns an error code if an error occurred.
+   *
+   * @param request to handle.
+   * @return the response to respond with.
+   */
   def put(request: AstProtos.AstPutRequest): AstProtos.AstPutResponse = {
     // Write the specified AST to the provided coordinates.
     val ast: CompilationUnit = {
